@@ -1,0 +1,145 @@
+package com.axonivy.compensation.converter;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.MapUtils;
+
+import com.axonivy.compensation.model.I18NModel;
+import com.axonivy.compensation.model.SalaryItemType;
+import com.axonivy.compensation.model.SalaryItemTypeYamlModel;
+
+public class SITYamlConverter {
+    
+    public static class Builder {
+        
+        Function<SalaryItemTypeYamlModel, SalaryItemType> convertFunction;
+        
+        public Builder() {
+            convertFunction = basic().andThen(convertI18n(Collections.emptyMap()));
+        }
+        
+        
+        public Builder useTenant(String tenant) {
+            convertFunction.andThen(assignUri(tenant));
+            return this;
+        }
+
+        public Builder useSomethingElse(String somethingElse) {
+            Function<SalaryItemType, SalaryItemType> somethingElseApply = sit -> sit.setCode(somethingElse);
+            convertFunction.andThen(somethingElseApply);
+            return this;
+        }
+        
+        
+        public Function<SalaryItemTypeYamlModel, SalaryItemType> build() {
+            return convertFunction;
+        }
+        
+    }
+    
+    public static Builder create() {
+        return new Builder();
+    }
+    
+    
+    public static Function<SalaryItemTypeYamlModel, SalaryItemType> fromYamlToModel() {
+        SITYamlConverter c = new SITYamlConverter();
+        return c::convertToModel;
+    }
+    
+    public static Function<SalaryItemTypeYamlModel, SalaryItemType> fromYamlToModel(String tenant) {
+        return basic().andThen(assignUri(tenant)).andThen(convertI18n(Collections.emptyMap()));
+        
+    }
+    
+    private static Function<SalaryItemTypeYamlModel, SalaryItemType> basic() {
+        return SITYamlConverter::convertToModelBasic;
+    }
+    
+    private static Function<SalaryItemType, SalaryItemType> assignUri(String tenant) {
+        return sit -> {
+            sit.setDescription(tenant);
+            return sit;
+        };
+    }
+    
+    
+    public SITYamlConverter() {
+        
+    }
+
+    public static SITYamlConverter createInstance() {
+        return new SITYamlConverter();
+    }
+
+    public static <$SOURCE, $TARGET> List<$TARGET> convert(List<$SOURCE> source, Function<$SOURCE, $TARGET> convert) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+    
+    public List<SalaryItemType> convertToListModel(List<SalaryItemTypeYamlModel> sitYmls){
+        return sitYmls.stream().filter(yml -> yml != null).map(yml -> convertToModel(yml)).collect(Collectors.toList());
+    }
+    
+    private static SalaryItemType convertToModelBasic(SalaryItemTypeYamlModel sitYml) {
+        SalaryItemType sit = new SalaryItemType();
+        sit.setCode(sitYml.getCode());
+        sit.setName(sitYml.getName());
+        sit.setFormula(sitYml.getFormula());
+//      sit.setUri(tenant + "abc");
+//      sit.setI18n(convertI18n(sitYml.getDescription()));
+        return sit;
+    }
+    
+    private SalaryItemType convertToModel(SalaryItemTypeYamlModel sitYml) {
+        SalaryItemType sit = new SalaryItemType();
+        sit.setCode(sitYml.getCode());
+        sit.setName(sitYml.getName());
+        sit.setFormula(sitYml.getFormula());
+//      sit.setUri(tenant + "abc");
+        sit.setI18n(convertI18n(sitYml.getDescription()));
+        return sit;
+    }
+
+    private static Function<SalaryItemType, SalaryItemType> convertI18n(Map<Locale, String> description) {
+        return sit -> {
+            Map<Locale, I18NModel> i18ns = new LinkedHashMap<>();
+            if (MapUtils.isNotEmpty(description)) {
+                for (Entry<Locale, String> entry : description.entrySet()) {
+                    i18ns.put(entry.getKey(), new I18NModel(entry.getValue()));
+                }
+            }
+            sit.setI18n(i18ns);
+            return sit;
+        };
+    }
+}
+
+
+
+
+
+
+==============================
+
+
+Function<SalaryYamlModel, SIT> function = SITYmlConverter.create()
+    .forTenant("asfsdf")
+    .somethingElse(234324)
+    .anotherSomethingElse("asfsaf")
+    .build();
+    
+    function.apply(x);
+    
+    
+  CompanyCompensation companyCompensation
+  
+  
+  
+    

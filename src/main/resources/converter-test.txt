@@ -1,0 +1,61 @@
+package com.axonivy.compensation.converter;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.Test;
+
+import com.axonivy.compensation.model.I18NModel;
+import com.axonivy.compensation.model.SalaryItemType;
+import com.axonivy.compensation.model.SalaryItemTypeYamlModel;
+import com.axonivy.compensation.model.VariableYamlModel;
+
+public class SITYamlConverterTest {
+
+    @Test
+    public void testConvertYamlModelToSIT(){
+        Map<Locale, String> description = new LinkedHashMap<>();
+        description.put(Locale.ENGLISH, "Monthly Salary");
+        description.put(Locale.GERMAN, "Monatslohn");
+        
+        SalaryItemTypeYamlModel sitYml = SalaryItemTypeYamlModel.createNew().withCode("1000").withName("MONTHLY_SALARY")
+                .withFormula("contract.getMonthlySalary(payslip.periodFrom);").withDescription(description)
+                .withVariables(Arrays.asList(VariableYamlModel.createNew().withName("GROSS_SALARY").withValue("1").withIsFinal(false)));
+        
+        SITYamlConverter converter = SITYamlConverter.createInstance();
+
+        SITYamlConverter.create()
+        .useTenant("abc")
+        .useSomethingElse("asfasf")
+        .build();
+        
+        
+        SalaryItemType converted = SITYamlConverter.fromYamlToModel().apply(sitYml);
+        
+        Arrays.asList(sitYml)
+            .stream()
+            .map(SITYamlConverter.ymlToModel().build();
+            .collect(Collectors.toSet());
+        
+        List<SalaryItemType> converteds = SITYamlConverter.convert(Arrays.asList(sitYml), SITYamlConverter.fromYamlToModel());
+        
+        
+        Map<Locale, I18NModel> des = new LinkedHashMap<>();
+        des.put(Locale.ENGLISH, new I18NModel("Monthly Salary"));
+        des.put(Locale.GERMAN, new I18NModel("Monatslohn"));
+        
+        assertEquals("1000", sit.getCode());
+        assertEquals("MONTHLY_SALARY", sit.getName());
+        assertEquals("contract.getMonthlySalary(payslip.periodFrom);", sit.getFormula());
+        assertEquals(des, sit.getI18n());
+        
+        
+    }
+
+}
