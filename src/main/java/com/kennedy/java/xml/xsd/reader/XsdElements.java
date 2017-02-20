@@ -1,7 +1,6 @@
 package com.kennedy.java.xml.xsd.reader;
 
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,6 +8,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.collections4.MapUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,7 +28,7 @@ public class XsdElements {
 		InputStream file3 = XsdElements.class.getClassLoader()
 				.getResourceAsStream("referenceXsd/SalaryDeclarationServiceTypes.xsd");
 		Map<String, Map<String, ComplexTypeXsd>> parentNode_childNode = new HashMap<>();
-		Map<String, SimpleTypeXsd> simpleType = new HashMap<>();
+		Map<String, SimpleTypeXsd> simpleTypes = new HashMap<>();
 		try {
 			// parse the document
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -50,18 +50,18 @@ public class XsdElements {
 			complexType2 = doc2.getElementsByTagName("xs:simpleType");
 			complexType3 = doc3.getElementsByTagName("xs:simpleType");
 			
-			simpleType = readerSimpTypeToMap(simpleType, complexType1);
-			simpleType = readerSimpTypeToMap(simpleType, complexType2);
-			simpleType = readerSimpTypeToMap(simpleType, complexType3);
+			simpleTypes = readerSimpTypeToMap(simpleTypes, complexType1);
+			simpleTypes = readerSimpTypeToMap(simpleTypes, complexType2);
+			simpleTypes = readerSimpTypeToMap(simpleTypes, complexType3);
 			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("**************************************");
-		printOutNodeInMap("SalaryDeclarationType", parentNode_childNode);
+//		printOutSimpleNodeInMap(simpleTypes);
 		System.out.println("**************************************");
-		printOutSimpleNodeInMap(simpleType);
+		printOutNodeInMap("SalaryDeclarationType", parentNode_childNode, simpleTypes);
 		System.out.println("**************************************");
 		
 	}
@@ -104,13 +104,13 @@ public class XsdElements {
 		return simpleType;
 	}
 
-	private void printOutNodeInMap(String name, Map<String, Map<String, ComplexTypeXsd>> nodeTypeList) {
+	private void printOutNodeInMap(String name, Map<String, Map<String, ComplexTypeXsd>> nodeTypeList, Map<String, SimpleTypeXsd> simpleTypes) {
 		System.out.println("<" + name + ">");
-		printOutNode(name, nodeTypeList.get(name), nodeTypeList, 1);
+		printOutNode(name, nodeTypeList.get(name), nodeTypeList, 1, simpleTypes);
 		System.out.println("</" + name + ">");
 	}
 
-	private void printOutNode(String name, Map<String, ComplexTypeXsd> childNode, Map<String, Map<String, ComplexTypeXsd>> nodeTypeList, int index) {
+	private void printOutNode(String name, Map<String, ComplexTypeXsd> childNode, Map<String, Map<String, ComplexTypeXsd>> nodeTypeList, int index, Map<String, SimpleTypeXsd> simpleTypes) {
 		StringBuilder node = new StringBuilder();
 		for (int i = 0; i < index; i++) {
 			node.append("  ");
@@ -122,9 +122,16 @@ public class XsdElements {
 		}
 		for (Entry<String, ComplexTypeXsd> entry : childNode.entrySet()) {
 			ComplexTypeXsd object = entry.getValue();
-			System.out.println(space + "<" + object.getNameType() + " -- " + object.getType() + " -- " + object.isRequired() + ">");
+			String type = object.getType();
+			String extractedConditional = null;
+			if (MapUtils.isNotEmpty(simpleTypes)) {
+				if (simpleTypes.containsKey(type)) {
+					extractedConditional = simpleTypes.get(type).toString();
+				}
+			}
+			System.out.println(space + "<" + object.getNameType() + " -- " + type + " -- required=\"" + object.isRequired() + "\" " + extractedConditional +">");
 			if (nodeTypeList.containsKey(object.getType())) {
-				printOutNode(object.getType(), nodeTypeList.get(object.getType()), nodeTypeList, index + 1);
+				printOutNode(object.getType(), nodeTypeList.get(object.getType()), nodeTypeList, index + 1, simpleTypes);
 			}
 			System.out.println(space + "</" + object.getNameType() + ">");
 		}
