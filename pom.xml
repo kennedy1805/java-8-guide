@@ -13,9 +13,23 @@
         <yaml.version>1.15</yaml.version>
         <bean.utils.version>1.9.2</bean.utils.version>
         <version.hibernate-validator-annotation-processor>4.1.0.Final</version.hibernate-validator-annotation-processor>
+        <version.common.collection>4.1</version.common.collection>
+        <version.common.lang>3.4</version.common.lang>
+        <version.common.io>2.5</version.common.io>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${version.common.collection}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${version.common.lang}</version>
+        </dependency>
         <!-- JavaEE -->
         <dependency>
             <groupId>javax</groupId>
@@ -42,7 +56,11 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>${yaml.version}</version>
 		</dependency>
-		
+		<dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${version.common.io}</version>
+        </dependency>
 		<dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
