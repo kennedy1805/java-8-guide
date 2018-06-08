@@ -16,9 +16,17 @@
         <version.common.collection>4.1</version.common.collection>
         <version.common.lang>3.4</version.common.lang>
         <version.common.io>2.5</version.common.io>
+        <version.lombok>1.16.16</version.lombok>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.lombok}</version>
+            <scope>provided</scope>
+        </dependency>
+    
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
