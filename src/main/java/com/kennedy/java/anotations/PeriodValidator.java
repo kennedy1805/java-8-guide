@@ -18,6 +18,8 @@ import javax.validation.Payload;
 
 import org.apache.commons.beanutils.BeanUtils;
 
+import com.java.ee.rest.handler.exeption.ValidationException;
+
 @Target({TYPE, ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PeriodValidator.DateValidation.class)
@@ -65,7 +67,7 @@ public @interface PeriodValidator {
 				firstDateObject = BeanUtils.getProperty(t, this.fromFieldName);
 				secondDateObject = BeanUtils.getProperty(t, this.toFieldName);
 			} catch (final Exception e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new ValidationException(e.getMessage(), e);
 			}
 
 			// leave null-checking to @NotNull on individual parameters

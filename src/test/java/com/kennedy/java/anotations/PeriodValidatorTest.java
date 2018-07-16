@@ -5,8 +5,8 @@ import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.startsWith;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.ValidationException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class PeriodValidatorTest {
 		contractModel.setEntryDate(LocalDate.of(2013, 1, 1));
 		contractModel.setExitDate(LocalDate.of(2014, 1, 1));
 		expectedException.expect(javax.validation.ValidationException.class);
-		expectedException.expectMessage(startsWith("Unexpected exception during isValid call"));
+		expectedException.expectMessage("Unexpected exception during isValid call");
 		ValidatorHelper.validate(contractModel);
 	}
 
@@ -74,7 +74,7 @@ public class PeriodValidatorTest {
 		contractModel.setDateFrom(LocalDate.of(2013, 1, 1));
 		contractModel.setDateTo(LocalDate.of(2013, 12, 2));
 		expectedException.expect(ValidationException.class);
-		expectedException.expectMessage(startsWith("Date to must happen after date from within 11 months"));
+		expectedException.expectMessage("Date to must happen after date from within 11 months");
 		ValidatorHelper.validate(contractModel);
 		
 		contractModel = new ContractWithAcceptedMonthRanged();
@@ -111,7 +111,7 @@ public class PeriodValidatorTest {
 		contractModel.setDateFrom(LocalDate.of(2013, 1, 1));
 		contractModel.setDateTo(LocalDate.of(2012, 1, 1));
 		expectedException.expect(ValidationException.class);
-		expectedException.expectMessage(startsWith("Date to must happen after date from"));
+		expectedException.expectMessage("Date to must happen after date from");
 		ValidatorHelper.validate(contractModel);
 	}
 	

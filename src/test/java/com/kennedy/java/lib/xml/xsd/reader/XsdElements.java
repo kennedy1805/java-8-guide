@@ -61,7 +61,7 @@ public class XsdElements {
 		System.out.println("**************************************");
 //		printOutSimpleNodeInMap(simpleTypes);
 		System.out.println("**************************************");
-		printOutNodeInMap("SalaryDeclarationType", parentNode_childNode, simpleTypes);
+		//printOutNodeInMap("SalaryDeclarationType", parentNode_childNode, simpleTypes);
 		System.out.println("**************************************");
 		
 	}
