@@ -1,7 +1,7 @@
 package com.kennedy.java.kata;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
 
 public class KataTest {
@@ -111,5 +111,77 @@ public class KataTest {
 		assertEquals(Kata.strCount("Hello", 'o'),1);
         assertEquals(Kata.strCount("Hello", 'l'),2);
         assertEquals(Kata.strCount("",'z'),0);
+	}
+	
+	@Test
+	public void RowSumOddNumbersTest() {
+		assertEquals(1, Kata.rowSumOddNumbers(1));
+		assertEquals(8, Kata.rowSumOddNumbers(2));
+		assertEquals(27, Kata.rowSumOddNumbers(3));
+		assertEquals(64, Kata.rowSumOddNumbers(4));
+		assertEquals(125, Kata.rowSumOddNumbers(5));
+		assertEquals(74088, Kata.rowSumOddNumbers(42));
+	}
+
+	@Test
+	public void toAlternativeStringTests() {
+		assertEquals("HELLO WORLD", Kata.toAlternativeString("hello world"));
+		assertEquals("hello world", Kata.toAlternativeString("HELLO WORLD"));
+		assertEquals("HELLO world", Kata.toAlternativeString("hello WORLD"));
+		assertEquals("hEllO wOrld", Kata.toAlternativeString("HeLLo WoRLD"));
+		assertEquals("Hello World", Kata.toAlternativeString(Kata.toAlternativeString("Hello World")));
+		assertEquals("12345", Kata.toAlternativeString("12345"));
+		assertEquals("1A2B3C4D5E", Kata.toAlternativeString("1a2b3c4d5e"));
+		assertEquals("sTRINGuTILS.TOaLTERNATINGcASE", Kata.toAlternativeString("StringUtils.toAlternatingCase"));
+		assertEquals("ALTerNAtiNG CaSe", Kata.toAlternativeString("altERnaTIng cAsE"));
+		assertEquals("altERnaTIng cAsE", Kata.toAlternativeString("ALTerNAtiNG CaSe"));
+		assertEquals("ALTerNAtiNG CaSe <=> altERnaTIng cAsE", Kata.toAlternativeString("altERnaTIng cAsE <=> ALTerNAtiNG CaSe"));
+		assertEquals("altERnaTIng cAsE <=> ALTerNAtiNG CaSe", Kata.toAlternativeString("ALTerNAtiNG CaSe <=> altERnaTIng cAsE"));
+	}
+
+	@Test
+	public void simpleTest() {
+		assertArrayEquals(new int[] { 5, 4, 3, 2, 1 }, Kata.reverse(5));
+	}
+	
+	@Test
+	public void startTest() {
+		assertEquals("Your string should start with a 1", '1', Kata.stringy(1).charAt(0));
+		assertEquals("Your string should start with a 1", '0', Kata.stringy(3).charAt(1));
+		assertEquals("Your string should start with a 1", '1', Kata.stringy(3).charAt(0));
+	}
+	
+	@Test
+	public void tests() {
+		Object[] haystack1 = { "3", "123124234", null, "needle", "world", "hay", 2, "3", true, false };
+		Object[] haystack2 = { "283497238987234", "a dog", "a cat", "some random junk", "a piece of hay", "needle", "something somebody lost a while ago" };
+		Object[] haystack3 = { 1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 5, 4, 3, 4, 5, 6, 67, 5, 5, 3, 3, 4, 2, 34, 234, 23, 4, 234, 324, 324, "needle", 1, 2, 3, 4, 5, 5, 6, 5, 4, 32, 3, 45,
+				54 };
+		assertEquals("found the needle at position 3", Kata.findNeedle(haystack1));
+		assertEquals("found the needle at position 5", Kata.findNeedle(haystack2));
+		assertEquals("found the needle at position 30", Kata.findNeedle(haystack3));
+	}
+	
+	@Test
+    public void countPositivesSumNegatives_BasicTest() {
+      int[] expectedResult = new int[] {10, -65};
+      assertArrayEquals(expectedResult, Kata.countPositivesSumNegatives(new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -11, -12, -13, -14, -15}));
+      int[] expectedResult1 = new int[] {8, -50};
+      assertArrayEquals(expectedResult1, Kata.countPositivesSumNegatives(new int[] {0, 2, 3, 0, 5, 6, 7, 8, 9, 10, -11, -12, -13, -14}));
+    }
+	
+	@Test
+    public void basicTest() {
+         assertEquals("apple", Kata.subtractSum(10));
+    }
+	
+	@Test
+    public void testMakeUpperCase() {
+       assertEquals("HELLO",Kata.makeUpperCase("hello"));
+    }
+	
+	@Test
+	public void testHowOld() {
+		assertEquals(5, Kata.howOld("5 years old"));
 	}
 }
