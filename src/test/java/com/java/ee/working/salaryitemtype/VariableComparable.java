@@ -1,4 +1,4 @@
-package com.kennedy.java.lib.yaml.converter.model;
+package com.java.ee.working.salaryitemtype;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -13,24 +13,22 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Variable {
+public class VariableComparable {
 	private String name;
-	private String value;
-	private Boolean isFinal;
-	private String validFrom;
-	private String validTo;
-
+	private String devValue;
+	private String masterValue;
+	private String isFinal;
+	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
 				.append(name)
-				.append(value)
+				.append(devValue)
 				.append(isFinal)
-				.append(validFrom)
-				.append(validTo)
+				.append(masterValue)
 				.toHashCode();
 	}
 
@@ -40,13 +38,12 @@ public class Variable {
 			return true;
 		if (obj == null || getClass() != obj.getClass())
 			return false;
-		Variable other = (Variable) obj;
+		VariableComparable other = (VariableComparable) obj;
 		return new EqualsBuilder()
 				.append(name, other.name)
-				.append(value, other.value)
+				.append(devValue, other.devValue)
+				.append(masterValue, other.masterValue)
 				.append(isFinal, other.isFinal)
-				.append(validFrom, other.validFrom)
-				.append(validTo, other.validTo)
 				.isEquals();
 	}
 	
@@ -54,11 +51,9 @@ public class Variable {
 	public String toString() {
 		return new ToStringBuilder(this, ToStringStyle.JSON_STYLE)
     			.append("name", name)
-    			.append("value", value)
+    			.append("firstValue", devValue)
+    			.append("secondValue", masterValue)
     			.append("isFinal", isFinal)
-    			.append("validFrom", validFrom)
-    			.append("validTo", validTo)
     			.toString();
 	}
-	
 }

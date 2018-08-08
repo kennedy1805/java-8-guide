@@ -1,4 +1,4 @@
-package com.kennedy.java.lib.yaml.converter.model;
+package com.java.ee.working.salaryitemtype;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -13,24 +13,18 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Variable {
-	private String name;
-	private String value;
-	private Boolean isFinal;
-	private String validFrom;
-	private String validTo;
-
+public class SalaryItemTypeComparable {
+	private String code;
+	private String variable;
+	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-				.append(name)
-				.append(value)
-				.append(isFinal)
-				.append(validFrom)
-				.append(validTo)
+				.append(code)
+				.append(variable)
 				.toHashCode();
 	}
 
@@ -40,25 +34,18 @@ public class Variable {
 			return true;
 		if (obj == null || getClass() != obj.getClass())
 			return false;
-		Variable other = (Variable) obj;
+		SalaryItemTypeComparable other = (SalaryItemTypeComparable) obj;
 		return new EqualsBuilder()
-				.append(name, other.name)
-				.append(value, other.value)
-				.append(isFinal, other.isFinal)
-				.append(validFrom, other.validFrom)
-				.append(validTo, other.validTo)
+				.append(code, other.code)
+				.append(variable, other.variable)
 				.isEquals();
 	}
 	
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this, ToStringStyle.JSON_STYLE)
-    			.append("name", name)
-    			.append("value", value)
-    			.append("isFinal", isFinal)
-    			.append("validFrom", validFrom)
-    			.append("validTo", validTo)
+    			.append("code", code)
+    			.append("variable", variable)
     			.toString();
 	}
-	
 }

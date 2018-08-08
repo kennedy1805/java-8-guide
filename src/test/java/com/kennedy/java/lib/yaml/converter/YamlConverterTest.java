@@ -12,10 +12,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.Yaml;
 
 import com.kennedy.java.lib.yaml.converter.model.SalaryItemType;
-
-import org.yaml.snakeyaml.Yaml;
 
 public class YamlConverterTest {
 
@@ -48,13 +47,15 @@ public class YamlConverterTest {
 	@Test
 	public void test_writer_SingleObject_parseSITToYaml() throws IOException {
 
-		List<SalaryItemType> sits = Arrays.asList(SalaryItemType.createNew().withName("MONTHLY_SALARY").withCode("1000")
-				.withFormula("contract.getMonthlySalary(payslip.periodFrom)").putDescription("en", "Monthly Salary")
-				.putDescription("de", "Monatslohn").addVariable("VAR_1", "1", false).addVariable("VAR_2", "1", false),
-				SalaryItemType.createNew().withName("HOURLY_SALARY").withCode("1005")
-						.withFormula("(variables.resolveVariableValue('9100')) ? (variables.resolveVariableValue('NET_OR_GROSS_SETOFF')) : null;")
-						.putDescription("en", "Monthly Salary").putDescription("de", "Monatslohn")
-						.addVariable("VAR_1", "'value'", false).addVariable("VAR_2", "I", false));
+		List<SalaryItemType> sits = Arrays.asList(
+				SalaryItemType.builder().name("MONTHLY_SALARY").code("1000").formula("contract.getMonthlySalary(payslip.periodFrom)")
+					.putDescription("en", "Monthly Salary")	.putDescription("de", "Monatslohn")
+					.addVariable("VAR_1", "1", false).addVariable("VAR_2", "1", false).build(),
+				SalaryItemType.builder().name("HOURLY_SALARY").code("1005")
+					.formula("(variables.resolveVariableValue('9100')) ? (variables.resolveVariableValue('NET_OR_GROSS_SETOFF')) : null;")
+					.putDescription("en", "Monthly Salary").putDescription("de", "Monatslohn")
+					.addVariable("VAR_1", "'value'", false).addVariable("VAR_2", "I", false).build());
+		
 		SalaryItemTypeRepresenter representer = new SalaryItemTypeRepresenter();
 		representer.setDefaultFlowStyle(FlowStyle.BLOCK);
 		DumperOptions option = new DumperOptions();

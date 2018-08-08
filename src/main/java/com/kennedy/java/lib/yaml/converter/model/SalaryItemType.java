@@ -6,85 +6,110 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.java.ee.working.beans.Mapped;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SalaryItemType {
 	
-	private String name;
+	@Mapped
 	private String code;
+	
+	@Mapped
+	private String name;
+	
+	@Mapped
 	private String formula;
-	private Map<String, String> description;
+	
 	private List<Variable> variables;
 	
-	public SalaryItemType(){
-		
+	private String description;
+	
+	private Map<Locale, String> i18n;
+	
+	private String tag;
+
+	private Map<Locale, String> tagI18N;
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+				.append(name)
+				.append(code)
+				.append(formula)
+				.append(description)
+				.append(i18n)
+				.append(tag)
+				.append(tagI18N)
+				.append(variables)
+				.toHashCode();
 	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getCode() {
-		return code;
-	}
-	public void setCode(String code) {
-		this.code = code;
-	}
-	public String getFormula() {
-		return formula;
-	}
-	public void setFormula(String formula) {
-		this.formula = formula;
-	}
-	public Map<String, String> getDescription() {
-		return description;
-	}
-	public void setDescription(Map<String, String> description) {
-		this.description = description;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		SalaryItemType other = (SalaryItemType) obj;
+		return new EqualsBuilder()
+				.append(name, other.name)
+				.append(code, other.code)
+				.append(formula, other.formula)
+				.append(description, other.description)
+				.append(i18n, other.i18n)
+				.append(tag, other.tag)
+				.append(tagI18N, other.tagI18N)
+				.append(variables, other.variables)
+				.isEquals();
 	}
 	
-	public List<Variable> getVariables() {
-		return variables;
-	}
-	public void setVariables(List<Variable> variables) {
-		this.variables = variables;
-	}
-	public static SalaryItemType createNew() {
-		return new SalaryItemType();
-	}
-	public SalaryItemType withName(String name) {
-		this.setName(name);
-		return this;
-	}
-	public SalaryItemType withCode(String code) {
-		this.setCode(code);
-		return this;
-	}
-	public SalaryItemType withFormula(String formula) {
-		this.setFormula(formula);
-		return this;
-	}
-	public SalaryItemType withDescription(Map<Locale, String> descriptions) {
-		this.setDescription(description);
-		return this;
-	}
 	@Override
 	public String toString() {
-		return "SalaryItemType [name=" + name + ", code=" + code + ", formula=" + formula + ", description="
-				+ description + "]";
+		return new ToStringBuilder(this, ToStringStyle.JSON_STYLE)
+    			.append("name", name)
+    			.append("code", code)
+    			.append("formula", formula)
+    			.append("description", description)
+    			.append("i18n", i18n)
+    			.append("tag", tag)
+    			.append("tagI18N", tagI18N)
+    			.append("validTo", variables)
+    			.toString();
 	}
-	public SalaryItemType putDescription(String locale, String value) {
-		if (description == null) {
-			description = new LinkedHashMap<>();
-		}
-		this.getDescription().put(locale, value);
-		return this;
-	}
-	public SalaryItemType addVariable(String name, String value, boolean isFinal) {
-		if (variables == null) {
-			variables = new ArrayList<>();
-		}
-		this.getVariables().add(new Variable(name, value, isFinal, null, null));
-		return this;
-	}
+	
+	public static class SalaryItemTypeBuilder {
+        public SalaryItemTypeBuilder putDescription(String locale, String value) {
+        	if (i18n == null) {
+        		i18n = new LinkedHashMap<>();
+    		}
+        	i18n.put(Locale.forLanguageTag(locale), value);
+    		return this;
+        }
+        
+        public SalaryItemTypeBuilder addVariable(String name, String value, boolean isFinal) {
+    		if (variables == null) {
+    			variables = new ArrayList<>();
+    		}
+    		variables.add(new Variable(name, value, isFinal, null, null));
+    		return this;
+    	}
+    }
+	
+	
 	
 }
