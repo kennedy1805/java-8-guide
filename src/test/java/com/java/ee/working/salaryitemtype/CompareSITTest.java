@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,34 +81,30 @@ public class CompareSITTest {
 				var.setName(varName);
 				var.setDevValue(devVariable.containsKey(varName) ? devVariable.get(varName).getValue() : null);
 				var.setMasterValue(masterVariable.containsKey(varName) ? masterVariable.get(varName).getValue() : null);
-				if (var.getMasterValue() == null) {
-					if (var.getDevValue() == null) {
-						var.setIsFinal("TRUE");
-					} else {
-						var.setIsFinal("FALSE");
-					}
-				} else if (var.getDevValue() == null) {
-					var.setIsFinal("FALSE");
-				} else if (var.getDevValue().equals(var.getMasterValue())) {
-					var.setIsFinal("TRUE");
-				} else {
-					var.setIsFinal("FALSE");
+				var.setIsFinal(compareNull(var.getMasterValue(), var.getDevValue()) ? "TRUE" : "FALSE");
+				if ("TRUE".equals(var.getIsFinal())) {
+					continue;
 				}
-				
+				var.setJson("- { name: " + getValue(varName) + ", value: " + getValue(var.getDevValue()) + ", isFinal: false}");
 				inputObjs.add(var);
 			}
-			
-			ins.setVariable(DataTableUtils.convertFromListObjectToStringTable(inputObjs, VariableComparable.class));
+			if (CollectionUtils.isEmpty(inputObjs)) {
+				continue;
+			}
 			Collections.sort(inputObjs, byVarName);
+			ins.setVariable(DataTableUtils.convertFromListObjectToStringTable(inputObjs, VariableComparable.class));
 			sitYamls.add(ins);
 		}
 		Collections.sort(sitYamls, bySitCode);
 		
 		Yaml yaml = new Yaml();
 		String stream = yaml.dump(sitYamls);
-		File file = new File("C:\\Users\\thvu\\Desktop\\sit_out.yaml");
+		File file = new File("C:\\Users\\thvu\\Desktop\\sit_out_2.yaml");
 		FileUtils.writeStringToFile(file, stream);
-		System.out.println(stream);
+	}
+
+	private String getValue(String var) {
+		return StringUtils.isBlank(var) ? null : "\"" + var + "\"";
 	}
 
 	private static String readLineByLineJava8(String filePath) {
@@ -121,4 +119,14 @@ public class CompareSITTest {
 		return contentBuilder.toString();
 	}
 
+	private boolean compareNull(String master, String dev) {
+		if (master == dev) {
+			return true;
+		} else if (master == null || dev == null) {
+			return false;
+		} else {
+			return master.equals(dev);
+		}
+	}
+	
 }

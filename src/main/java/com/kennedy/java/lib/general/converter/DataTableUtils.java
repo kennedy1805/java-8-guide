@@ -26,7 +26,7 @@ import com.java.ee.rest.handler.exeption.SystemErrorException;
 import com.java.ee.rest.handler.exeption.ValidationException;
 
 public class DataTableUtils {
-	private static final int NUMBER_FOUR = 4;
+	private static final int NUMBER_FOUR = 2;
 	private static final String SNIPPET_FIELD_NAME_I18NS_PROPERTY_NAME = "snippetFieldNameI18ns";
 	private static final String POSTING_TEXT_I18NS_PROPERTY_NAME = "postingTextI18ns";
 	private static final char COLON = ':';
@@ -189,7 +189,7 @@ public class DataTableUtils {
 
     private static String formatColumn(String cellData, Long columnMaxSize) {
         String fixedSpacePrefix = StringUtils.repeat(" ", NUMBER_FOUR);
-        Long columnMaxSizeAfterAddSpace = columnMaxSize + 4*2;
+        Long columnMaxSizeAfterAddSpace = columnMaxSize + NUMBER_FOUR * 2;
         if (cellData == null) {
         	cellData = "";
         }

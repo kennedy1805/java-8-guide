@@ -19,7 +19,6 @@ import lombok.Setter;
 public class SalaryItemTypeComparable {
 	private String code;
 	private String variable;
-	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

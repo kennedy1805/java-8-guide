@@ -21,7 +21,7 @@ public class VariableComparable {
 	private String devValue;
 	private String masterValue;
 	private String isFinal;
-	
+	private String json;
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
