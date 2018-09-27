@@ -219,7 +219,21 @@ public class DataTableUtils {
         return columnsMaxSize;
     }
     
-    public static <T> String convertFromListObjectToStringTable(List<T> inputObjs, Class<T> clazz) {
+    public static String convertFromListObjectToStringTable(List<Map<String, String>> inputObjs) {
+        Set<String> allFieldsInObject = inputObjs.stream().flatMap(obj -> obj.keySet().stream()).collect(Collectors.toSet());
+
+        StringBuilder resultTable = new StringBuilder();
+        StringBuilder lineHeader = new StringBuilder();
+        lineHeader.append(COLUMN_SEPARATOR).append(allFieldsInObject.stream().collect(Collectors.joining("|"))).append(COLUMN_SEPARATOR);
+        
+        resultTable.append(lineHeader).append(TABLE_NEW_ROW);
+        inputObjs.stream().forEach(obj -> resultTable.append(extractDataInSingleProperties(obj, allFieldsInObject)));
+        resultTable.setLength(resultTable.length() - TABLE_NEW_ROW_LENGTH);
+
+        return formatTable(resultTable.toString());
+    }
+    
+	public static <T> String convertFromListObjectToStringTable(List<T> inputObjs, Class<T> clazz) {
         List<Field> allFieldsInObject = Arrays.asList(clazz.getDeclaredFields());
         List<Field> workingFields = allFieldsInObject.stream()
                 .filter(field -> !field.isAnnotationPresent(DataTableIgnored.class))
@@ -279,6 +293,13 @@ public class DataTableUtils {
         return lineData.toString();
     }
 
+	private static String extractDataInSingleProperties(Map<String, String> obj, Set<String> allFieldsInObject) {
+		StringBuilder eachLine = new StringBuilder();
+		eachLine.append(COLUMN_SEPARATOR).append(allFieldsInObject.stream().map(field -> obj.get(field)).collect(Collectors.joining("|"))).append(COLUMN_SEPARATOR);
+		eachLine.append(TABLE_NEW_ROW);
+		return eachLine.toString();
+	}
+    
     @SuppressWarnings("unchecked")
     private static <T> String getDataFromCollectionField(List<T> inputObjs, T obj, Field objField) throws ReflectiveOperationException {
         StringBuilder lineData = new StringBuilder();

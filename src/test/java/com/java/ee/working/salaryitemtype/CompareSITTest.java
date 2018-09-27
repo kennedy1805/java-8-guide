@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,9 +48,48 @@ public class CompareSITTest {
 	@Inject
 	private SalaryItemTypeService salaryItemTypeService;
 
+	@Test
+	public void print_all_SIT_Have_condition() {
+		Map<String, String> conditions = new HashMap<>();
+		conditions.put("ACCOUNTING_GROUP", "GROSS_SALARY");
+		
+		
+		String sitDev = readLineByLineJava8(FILE_1);
+		List<SalaryItemType> sit_dev = salaryItemTypeService.extractSITFromString(sitDev);
+		
+		List<String> codes = new ArrayList<>();
+		for (SalaryItemType salaryItemType : sit_dev) {
+			List<Variable> vars = salaryItemType.getVariables();
+			
+			if (isMatchedWithCondtion(vars, conditions)) {
+				codes.add(salaryItemType.getCode());
+			}
+		}
+		Collections.sort(codes);
+		System.err.println(codes);
+	}
+	
+	
+	private boolean isMatchedWithCondtion(List<Variable> vars, Map<String, String> conditions) {
+		for (Entry<String, String> entry : conditions.entrySet()) {
+			boolean foundItem = false;
+			for (Variable var : vars) {
+				if (entry.getKey().equals(var.getName()) && entry.getValue().equals(var.getValue())) {
+					foundItem = true;
+					break;
+				}
+			}
+			if (!foundItem) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+
 	@SuppressWarnings("deprecation")
 	@Test
-	public void test_writer_SingleObject_parseSITToYaml() throws IOException {
+	public void output_differences_between_Dev_master() throws IOException {
 
 		String sitDev = readLineByLineJava8(FILE_1);
 		List<SalaryItemType> sit_dev = salaryItemTypeService.extractSITFromString(sitDev);
@@ -67,7 +108,7 @@ public class CompareSITTest {
 			
 			SalaryItemType dev = mapDev.get(code);
 			SalaryItemType master = mapMaster.get(code);
-			
+			ins.setDifferentFormula(isDifferentFormula(dev.getFormula(), master.getFormula()));
 			ins.setVariable(getDataTableDifferencesVariables(dev, master));
 			ins.setTags(getDataTableDifferencesTags(dev, master));
 			ins.setDescriptions(getDataTableDifferencesDescriptions(dev, master));
@@ -81,10 +122,72 @@ public class CompareSITTest {
 		
 		Yaml yaml = new Yaml();
 		String stream = yaml.dump(sitYamls);
+		exportToFile(stream);
+	}
+
+
+	private Boolean isDifferentFormula(String first, String second) {
+		return adjustFormula(first).equals(adjustFormula(second)) ? null : true;
+	}
+
+	private String adjustFormula(String formula) {
+		formula = formula.replace("\n", "").replace(" ", "");
+		return formula;
+	}
+	
+	@Test
+	public void output_SIT_Accounting_dataTables() throws IOException {
+//		List<String> acceptedSITs = Arrays.asList("1000","1900","1910","5081","6000","5111","1972","5093","5120","5050","1961","6600","6551","6552","6553");
+		String sitDev = readLineByLineJava8(FILE_1);
+		List<SalaryItemType> sit_dev = salaryItemTypeService.extractSITFromString(sitDev);
+		List<Map<String, String>> sitsTags = sit_dev.stream()
+//				.filter(sit -> acceptedSITs.contains(sit.getCode()))
+				.filter(SalaryItemType::containsAccountingVariables)
+				.map(sit -> {
+			Map<String, String> map = new HashMap<>();
+			map.put("code", sit.getCode());
+			map.put("description_en", sit.getI18n().get(Locale.ENGLISH));
+			map.put("description_de", sit.getI18n().get(Locale.GERMAN));
+			for (String varName : sit.getAccountingVariables()) {
+				String variableValueByName = sit.getVariableValueByName(varName);
+				map.put(varName, variableValueByName == null ? "" : variableValueByName);
+			}
+			return map;
+		}).collect(Collectors.toList());
+		
+		String stream = DataTableUtils.convertFromListObjectToStringTable(sitsTags);
+		exportToFile(stream);
+	}
+	
+	
+	@Test
+	public void output_Tags_dataTables() throws IOException {
+		List<String> acceptedSITs = Arrays.asList("5011","5021","5031","5032");
+		
+		String sitDev = readLineByLineJava8(FILE_1);
+		List<SalaryItemType> sit_dev = salaryItemTypeService.extractSITFromString(sitDev);
+		
+		List<Map<String, String>> sitsTags = sit_dev.stream()
+				.filter(sit -> acceptedSITs.contains(sit.getCode()))
+				.map(sit -> {
+			Map<String, String> map = new HashMap();
+			map.put("code", sit.getCode());
+			for (Entry<Locale, String> tags : sit.getTagI18N().entrySet()) {
+				map.put(tags.getKey().getLanguage(), tags.getValue());
+			}
+			return map;
+		}).collect(Collectors.toList());
+		String stream = DataTableUtils.convertFromListObjectToStringTable(sitsTags);
+		exportToFile(stream);
+	}
+
+
+	private void exportToFile(String stream) throws IOException {
 		File file = new File(OUTPUT_FILE);
 		FileUtils.writeStringToFile(file, stream);
 	}
-
+	
+	
 	private String getDataTableDifferencesDescriptions(SalaryItemType dev, SalaryItemType master) {
 		Set<String> keys = new HashSet<>();
 		Map<Locale, String> devTag = new HashMap<>();
@@ -152,6 +255,7 @@ public class CompareSITTest {
 			masterVariable = master.getVariables().stream().collect(Collectors.toMap(Variable::getName, item -> item));
 		}
 		List<VariableComparable> inputObjs = new ArrayList<>();
+		StringBuilder difs = new StringBuilder();
 		for (String varName : varNames) {
 			VariableComparable var = new VariableComparable();
 			var.setName(varName);
@@ -161,7 +265,9 @@ public class CompareSITTest {
 			if ("TRUE".equals(var.getIsFinal())) {
 				continue;
 			}
-			var.setJson("- { name: " + getValue(varName) + ", value: " + getValue(var.getDevValue()) + ", isFinal: false}");
+			String str = "- { name: " + getValue(varName) + ", value: " + getValue(var.getDevValue()) + ", isFinal: false}";
+			var.setJson(str);
+			difs.append(str).append("\n");
 			inputObjs.add(var);
 		}
 		if (CollectionUtils.isEmpty(inputObjs)) {
@@ -188,6 +294,8 @@ public class CompareSITTest {
 	}
 
 	private boolean compareNull(String master, String dev) {
+		List<Integer> intis = new ArrayList<>();
+		intis.add(1/2);
 		if (master == dev) {
 			return true;
 		} else if (master == null || dev == null) {

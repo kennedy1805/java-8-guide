@@ -56,8 +56,6 @@ public class Variable {
     			.append("name", name)
     			.append("value", value)
     			.append("isFinal", isFinal)
-    			.append("validFrom", validFrom)
-    			.append("validTo", validTo)
     			.toString();
 	}
 	

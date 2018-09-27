@@ -22,6 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SalaryItemTypeComparable {
 	private String code;
+	private Boolean differentFormula;
 	private String variable;
 	private String tags;
 	private String descriptions;
@@ -29,6 +30,7 @@ public class SalaryItemTypeComparable {
 	public int hashCode() {
 		return new HashCodeBuilder()
 				.append(code)
+				.append(differentFormula)
 				.append(variable)
 				.append(tags)
 				.append(descriptions)
@@ -44,6 +46,7 @@ public class SalaryItemTypeComparable {
 		SalaryItemTypeComparable other = (SalaryItemTypeComparable) obj;
 		return new EqualsBuilder()
 				.append(code, other.code)
+				.append(differentFormula, other.differentFormula)
 				.append(variable, other.variable)
 				.append(tags, other.tags)
 				.append(descriptions, other.descriptions)
@@ -54,6 +57,7 @@ public class SalaryItemTypeComparable {
 	public String toString() {
 		return new ToStringBuilder(this, ToStringStyle.JSON_STYLE)
     			.append("code", code)
+    			.append("differentFormula", differentFormula)
     			.append("variable", variable)
     			.append("tags", tags)
     			.append("descriptions", descriptions)

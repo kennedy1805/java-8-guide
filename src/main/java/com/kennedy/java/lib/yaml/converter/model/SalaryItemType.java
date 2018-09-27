@@ -1,11 +1,13 @@
 package com.kennedy.java.lib.yaml.converter.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -44,6 +46,8 @@ public class SalaryItemType {
 	private String tag;
 
 	private Map<Locale, String> tagI18N;
+	
+	private final List<String> accountingVariables = Arrays.asList("ACCOUNTING_GROUP", "LINK_TYPE");
 	
 	@Override
 	public int hashCode() {
@@ -110,6 +114,28 @@ public class SalaryItemType {
     	}
     }
 	
+	public boolean containsAccountingVariables() {
+		if (CollectionUtils.isEmpty(variables)) {
+			return false;
+		}
+		for (Variable var : variables) {
+			if (accountingVariables.contains(var.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
-	
+	public String getVariableValueByName(String varName) {
+		if (CollectionUtils.isEmpty(variables)) {
+			return null;
+		}
+		for (Variable var : variables) {
+			if (varName.equals(var.getName())) {
+				return var.getValue();
+			}
+		}
+		return null;
+	}
+	 
 }

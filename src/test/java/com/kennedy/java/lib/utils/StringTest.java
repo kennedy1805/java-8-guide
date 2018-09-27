@@ -28,5 +28,12 @@ public class StringTest {
 		
 		return countXX;
 	}
+	
+	@Test
+	public void extract_seq_from_link() {
+		String link = "/luz_accounting/api/e3df4e2c-f1a3-4ba3-8202-6282d5ded65f/companies/1/bookings/41/booking-details/seq=2";
+		Integer seq = Integer.parseInt(link.substring(link.indexOf("seq=") + 4));
+		System.out.println("seq=" + seq);
+	}
 
 }
